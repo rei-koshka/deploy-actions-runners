@@ -1,0 +1,19 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "bashdb",
+      "request": "launch",
+      "name": "create-runners",
+      "pathBash": "/bin/bash",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/create-runners.sh",
+      "showDebugOutput": true,
+      "terminalKind": "integrated",
+      "args": ["1", "2.303.0-ubuntu-focal"]
+    }
+  ]
+}
