@@ -19,19 +19,21 @@ curl -fsSL https://get.docker.com -o get-docker.sh && \
 
 ## How to use
 
-1. Clone this repository to a host instance:
+1. Add topic `self-hosted-runner` for each of your repositories that you want to get a runner.
+
+2. Clone this repository to a host instance:
 
    ```bash
    git clone git@github.com:Danand/deploy-actions-runners.git
    ```
 
-2. Set executable permission for the script:
+3. Set executable permission for the script:
 
    ```bash
    chmod +x ./create-runners.sh
    ```
 
-3. Run the script:
+4. Run the script:
 
    ```bash
    echo "${YOUR_GITHUB_PAT_HERE}" | \

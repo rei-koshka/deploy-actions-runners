@@ -27,7 +27,13 @@ function get_owner_repo_full_names() {
     --header "X-GitHub-Api-Version: 2022-11-28" \
     "https://api.github.com/user/repos")"
 
-  echo "${response}" | jq -r '.[] | select(.permissions.admin == true) | .full_name'
+  echo "${response}" | \
+  jq -r '
+    .[]
+    | select(.topics | any(index("self-hosted-runner")))
+    | select(.permissions.admin)
+    | .full_name
+  '
 }
 
 function check_repo_has_workflows() {
