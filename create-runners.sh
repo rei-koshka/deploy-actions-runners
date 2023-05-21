@@ -107,16 +107,6 @@ function get_base_image_version() {
   fi
 }
 
-function print_first_logs() {
-  docker logs --follow "${container_id}" &
-
-  local logs_pid="$!"
-
-  sleep 10
-
-  kill -s "SIGINT" "${logs_pid}"
-}
-
 function run_runner_containers() {
   local repo_full_name="$1"
   local runner_token="$2"
@@ -151,8 +141,6 @@ function run_runner_containers() {
       --volume /var/run/docker.sock:/var/run/docker.sock \
       --volume /tmp/${runner_name}:/tmp/${runner_name} \
       "${runner_image_tag}")"
-
-    print_first_logs "${container_id}"
   done
 }
 
