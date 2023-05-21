@@ -156,7 +156,7 @@ function create_runners_for_owner() {
   get_owner_repo_full_names | while read repo_full_name; do
     local answer
 
-    while ["${answer}" != "N" ] && [ "${answer}" != "y" ]; do
+    while [ "${answer}" != "N" ] && [ "${answer}" != "y" ]; do
       echo "Do you want to create runner for ${repo_full_name}? [y/N]"
       read answer
     done
