@@ -166,6 +166,17 @@ function create_runners_for_owner() {
   build_runner_image "${base_image_version}" "${runner_image_tag}"
 
   get_owner_repo_full_names | while read repo_full_name; do
+
+  local answer
+
+  while ["${answer}" != "N" ] && [ "${answer}" != "y" ]; do
+    echo "Do you want to create runner for ${repo_full_name}? [y/N]"
+    read answer
+  done
+
+  if [ "${answer}" == "N" ]; then
+    continue
+
     if $(check_repo_has_workflows "${repo_full_name}"); then
       local runner_token="$(get_runner_token "${repo_full_name}")"
 
@@ -189,4 +200,4 @@ fi
 
 export GITHUB_PAT
 
-create_runners_for_owner "$1" "$2" "$3"
+create_runners_for_owner "$@"
