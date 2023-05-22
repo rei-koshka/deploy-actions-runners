@@ -8,7 +8,7 @@ It launches a specified amount of GitHub Actions runners in Docker for all repos
 
 ## Prerequisites
 
-There is need in installing some dependencies on a host instance:
+There is need in installing some minimal dependencies on a host instance:
 
 ```bash
 apt update && \
@@ -38,9 +38,11 @@ curl -fsSL https://get.docker.com -o get-docker.sh && \
    ```bash
    echo "${YOUR_GITHUB_PAT_HERE}" | \
    ./create-runners.sh \
-     "1" \
-     "2.303.0-ubuntu-focal" \
-     "unix,ubuntu,ubuntu-20.04,ubuntu-focal,debian-based,bash,apt,docker"
+     --token-stdin \
+     --quantity 1 \
+     --base-image "2.303.0-ubuntu-focal" \
+     --labels "unix,ubuntu,ubuntu-20.04,ubuntu-focal,debian-based,bash,apt,docker" \
+     --repo "owner/repo" # Optional.
    ```
 
 ## Parameters
