@@ -4,12 +4,6 @@
 # in Docker for all repositories (of PAT holder)
 # that has any workflows.
 #
-#   Parameters:
-#     stdin: GitHub Personal Access Token.
-#     $1:    Quantity of runners per repository.
-#     $2:    Version of base image.
-#     $3:    Labels for runners.
-#
 #   Base image:
 #     https://hub.docker.com/r/myoung34/github-runner
 #     https://github.com/myoung34/docker-github-actions-runner
@@ -144,7 +138,7 @@ function run_runner_containers() {
   done
 }
 
-function create_runners_for_owner() {
+function create_runners() {
   local quantity="$1"
   local labels="$3"
 
@@ -167,14 +161,101 @@ function create_runners_for_owner() {
   done
 }
 
+function create_runner() {
+  local quantity="$1"
+  local labels="$3"
+  local repo_full_name="$4"
+
+  local base_image_version="$(get_base_image_version "$2")"
+  local runner_image_tag="$(get_runner_image_tag "${base_image_version}")"
+
+  build_runner_image "${base_image_version}" "${runner_image_tag}"
+
+  local runner_token="$(get_runner_token "${repo_full_name}")"
+
+  run_runner_containers \
+    "${repo_full_name}" \
+    "${runner_token}" \
+    "${runner_image_tag}" \
+    "${quantity}" \
+    "${labels}"
+}
+
 # ==================== EXECUTION ====================
 
 set -e
 
-if [ -z "${GITHUB_PAT}" ]; then
-  GITHUB_PAT="$(cat)"
+quantity=1
+base_image="2.303.0-ubuntu-focal"
+labels="docker"
+repo=""
+need_help=false
+
+while [ $# -gt 0 ]; do
+  if [ "$1" == "--token" ]; then
+    GITHUB_PAT="$2"
+    shift
+    shift
+  elif [ "$1" == "--token-stdin" ]; then
+    GITHUB_PAT="$(cat)"
+    shift
+  elif [ "$1" == "--quantity" ]; then
+    quantity="$2"
+    shift
+    shift
+  elif [ "$1" == "--base-image" ]; then
+    base_image="$2"
+    shift
+    shift
+  elif [ "$1" == "--labels" ]; then
+    labels="$2"
+    shift
+    shift
+  elif [ "$1" == "--repo" ]; then
+    repo="$2"
+    shift
+    shift
+  elif [ "$1" == "--help" ]; then
+    need_help=true
+    shift
+  fi
+done
+
+if $need_help; then
+  echo
+  echo "  Launches specified amount of GitHub Actions runners"
+  echo "  in Docker for all repositories (of PAT holder)"
+  echo "  that has any workflows."
+  echo
+  echo "    Environment:"
+  echo "      GITHUB_PAT       GitHub Personal Access Token."
+  echo
+  echo "    Parameters:"
+  echo "      --token          GitHub Personal Access Token."
+  echo "      --token-stdin    Pass GitHub Personal Access Token via stdin."
+  echo "      --base-image     Version of base image."
+  echo "      --quantity       Quantity of runners per repository."
+  echo "      --labels         Labels for all runners."
+  echo "      --repo           Single exact repo, in format \`owner/repo-name\`."
+  echo "      --help           Prints this message."
+  echo
+
+  exit 0
 fi
 
 export GITHUB_PAT
 
-create_runners_for_owner "$@"
+if [ -z "${repo}" ]; then
+  create_runners \
+    "${quantity}" \
+    "${base_image}" \
+    "${labels}"
+else
+  create_runner \
+    "${quantity}" \
+    "${base_image}" \
+    "${labels}" \
+    "${repo}"
+fi
+
+exit 0
